@@ -1,6 +1,6 @@
 ### Coinbase API 專案
 
-這是一個基於 Spring Boot 的專案，用於查詢和轉換 Coindesk 的比特幣價格資訊，並提供幣別管理功能。
+這是一個Spring Boot 的專案，用於查詢和轉換 Coindesk 的比特幣價格資訊，並提供幣別管理功能。
 
 ## 相關技術
 
