@@ -29,10 +29,10 @@
 ### 幣別管理
 
 - **GET** `/api/currencies` - 查詢所有幣別
-- **GET** `/api/currencies/{id}` - 查詢指定幣別
+- **GET** `/api/currencies/{code}` - 查詢指定幣別
 - **POST** `/api/currencies` - 新增新幣別
-- **PUT** `/api/currencies/{id}` - 更新幣別
-- **DELETE** `/api/currencies/{id}` - 刪除幣別
+- **PUT** `/api/currencies/{code}` - 更新幣別
+- **DELETE** `/api/currencies/{code}` - 刪除幣別
 
 ### Coindesk API
 
