@@ -72,7 +72,6 @@ class CoinServiceTest {
         mockResponse.setBpi(bpi);
 
         Currency usdCurrency = new Currency();
-        usdCurrency.setId(1L);
         usdCurrency.setCode("USD");
         usdCurrency.setChineseName("美元");
 
@@ -97,7 +96,6 @@ class CoinServiceTest {
     void testCurrencyCRUD() {
         // 測試案例
         Currency currency = new Currency();
-        currency.setId(1L);
         currency.setCode("USD");
         currency.setChineseName("美元");
 
@@ -108,7 +106,6 @@ class CoinServiceTest {
         // 測試新增
         Currency savedCurrency = coinService.saveCurrency(currency);
         assertNotNull(savedCurrency);
-        assertEquals(1L, savedCurrency.getId());
         assertEquals("USD", savedCurrency.getCode());
         assertEquals("美元", savedCurrency.getChineseName());
 

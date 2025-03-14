@@ -39,10 +39,8 @@ public class CoinController {
     public ResponseEntity<Currency> updateCurrency(@PathVariable String code, @RequestBody Currency currency) {
         return coinService.getCurrencyByCode(code)
                 .map(existingCurrency -> {
-                    currency.setId(existingCurrency.getId());
-                    currency.setCode(code);
-                    currency.setCreatedDate(existingCurrency.getCreatedDate());
-                    return ResponseEntity.ok(coinService.saveCurrency(currency));
+                    existingCurrency.setChineseName(currency.getChineseName());
+                    return ResponseEntity.ok(coinService.saveCurrency(existingCurrency));
                 })
                 .orElse(ResponseEntity.notFound().build());
     }

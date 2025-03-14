@@ -1,7 +1,9 @@
 package com.example.coinbase;
 
 import com.example.coinbase.entity.Currency;
+import com.example.coinbase.repository.CurrencyRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -9,11 +11,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Transactional
 class CoinControllerIntegrationTest {
 
     @Autowired
@@ -22,36 +26,53 @@ class CoinControllerIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private CurrencyRepository currencyRepository;
+
+    @BeforeEach
+    void setUp() {
+        currencyRepository.deleteAll();
+    }
+
     @Test
-    void testCurrencyCRUDOperations() throws Exception {
-        // 測試新增幣別
+    public void testCurrencyCRUDOperations() throws Exception {
         Currency currency = new Currency();
         currency.setCode("JPY");
         currency.setChineseName("日圓");
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/currencies")
+        // 創建貨幣
+        String createResult = mockMvc.perform(MockMvcRequestBuilders.post("/api/currencies")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(currency)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value("JPY"))
-                .andExpect(jsonPath("$.chineseName").value("日圓"));
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
 
-        // 測試查詢幣別
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/currencies/JPY"))
+        Currency createdCurrency = objectMapper.readValue(createResult, Currency.class);
+
+        // 讀取貨幣
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/currencies/" + currency.getCode()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.chineseName").value("日圓"));
+                .andExpect(jsonPath("$.code").value(currency.getCode()))
+                .andExpect(jsonPath("$.chineseName").value(currency.getChineseName()));
 
-        // 測試更新幣別
+        // 更新貨幣
         currency.setChineseName("日元");
-        mockMvc.perform(MockMvcRequestBuilders.put("/api/currencies/JPY")
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/currencies/" + currency.getCode())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(currency)))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(currency.getCode()))
                 .andExpect(jsonPath("$.chineseName").value("日元"));
 
-        // 測試刪除幣別
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/currencies/JPY"))
+        // 刪除貨幣
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/currencies/" + currency.getCode()))
                 .andExpect(status().isOk());
+
+        // 確認刪除成功
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/currencies/" + currency.getCode()))
+                .andExpect(status().isNotFound());
     }
 
     @Test
